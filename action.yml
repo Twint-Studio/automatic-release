@@ -1,0 +1,56 @@
+name: "Simple Automatic Release"
+description: "Create or update a GitHub release, optionally upload assets, with or without generated notes"
+author: ""
+
+inputs:
+  repo_token:
+    description: "GitHub token (e.g. secrets.GITHUB_TOKEN)"
+    required: true
+  tag:
+    description: "Release tag to create or update. Defaults to the pushed tag when running on a tag ref."
+    required: false
+  title:
+    description: "Release title. Defaults to the tag name."
+    required: false
+  draft:
+    description: "Create a draft release."
+    required: false
+    default: "false"
+  prerelease:
+    description: "Mark the release as a pre-release."
+    required: false
+    default: "false"
+  generate_release_notes:
+    description: "Generate release notes automatically using GitHub."
+    required: false
+    default: "true"
+  body:
+    description: "Release body text. Ignored when generate_release_notes is true."
+    required: false
+    default: ""
+  files:
+    description: "Newline-separated glob patterns for assets to upload."
+    required: false
+    default: ""
+  overwrite:
+    description: "Delete an existing release and assets for the same tag before creating a new one."
+    required: false
+    default: "true"
+
+outputs:
+  release_id:
+    description: "The ID of the created release"
+  tag:
+    description: "The release tag"
+  upload_url:
+    description: "The upload URL for release assets"
+  html_url:
+    description: "The release HTML URL"
+
+runs:
+  using: "node24"
+  main: "dist/index.mjs"
+
+branding:
+  icon: "tag"
+  color: "blue"

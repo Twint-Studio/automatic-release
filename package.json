@@ -1,0 +1,20 @@
+{
+  "name": "automatic-release",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A simple GitHub Action to create releases and upload assets",
+  "main": "dist/index.mjs",
+  "scripts": {
+    "build": "ncc build src/index.mjs -o dist --license licenses.txt",
+    "check": "node --check src/index.mjs"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^3.0.1",
+    "@actions/github": "^9.1.1",
+    "@actions/glob": "^0.7.0"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.45.0"
+  }
+}
