@@ -41134,18 +41134,40 @@ async function findReleaseByTag(kit, owner, repo, tag) {
     }
 }
 
+function isMissingRefError(error) {
+    if (!error) return false;
+    if (error.status === 404) return true;
+
+    return error.status === 422 && /reference does not exist/i.test(error.message || "");
+}
+
 async function deleteReleaseAndTag(kit, owner, repo, release, tag) {
     if (release) {
         info(`Deleting existing release "${release.name || release.tag_name}" (id ${release.id})`);
         await kit.rest.repos.deleteRelease({ owner, repo, release_id: release.id });
     }
 
+    const ref = `tags/${tag}`;
+
     try {
-        info(`Deleting existing tag ref "tags/${tag}"`);
-        await kit.rest.git.deleteRef({ owner, repo, ref: `tags/${tag}` });
+        await kit.rest.git.getRef({ owner, repo, ref });
     } catch (error) {
-        if (error && error.status === 404) info(`Tag "tags/${tag}" does not exist, skipping tag deletion`);
-        else throw error;
+        if (isMissingRefError(error)) {
+            info(`Tag "${ref}" does not exist, skipping tag deletion`);
+            return;
+        }
+        throw error;
+    }
+
+    try {
+        info(`Deleting existing tag ref "${ref}"`);
+        await kit.rest.git.deleteRef({ owner, repo, ref });
+    } catch (error) {
+        if (isMissingRefError(error)) {
+            info(`Tag "${ref}" does not exist, skipping tag deletion`);
+            return;
+        }
+        throw error;
     }
 }
 
